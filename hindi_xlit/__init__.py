@@ -1,10 +1,12 @@
 """
 Hindi Transliteration Library
-A lightweight CPU-only library for Roman to Devanagari (Hindi) transliteration.
+============================
+
+A Python library for transliterating English text to Hindi using AI4Bharat's model.
 """
 
-from .transliterator import HindiTransliterator
-from .hindi_model import XlitPiston
-
 __version__ = "1.0.0"
-__all__ = ['HindiTransliterator', 'XlitPiston'] 
+
+from .transliterator import HindiTransliterator
+
+__all__ = ["HindiTransliterator"] 

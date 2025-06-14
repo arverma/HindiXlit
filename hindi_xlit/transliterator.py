@@ -4,74 +4,113 @@ Using the original AI4Bharat model for Roman to Devanagari transliteration
 """
 
 import os
+import re
 from typing import List, Union
 from .hindi_model import XlitPiston
 
 
 class HindiTransliterator:
     """
-    Hindi transliterator for Roman to Devanagari conversion (word-level only)
+    Main interface for Hindi transliteration.
+    Handles model loading, configuration, and preprocessing internally.
     """
-    def __init__(self, model_dir=None, beam_size=4):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        if model_dir is None:
-            model_dir = os.path.join(current_dir, 'models', 'hindi')
-        self.model_path = os.path.join(model_dir, 'hi_111_model.pth')
-        self.vocab_path = os.path.join(model_dir, 'hi_words_a4b.json')
-        self.script_path = os.path.join(model_dir, 'hi_scripts.json')
-        self.beam_size = beam_size
-        self.transliterator = XlitPiston(
-            weight_path=self.model_path,
-            tglyph_cfg_file=self.script_path,
-            iglyph_cfg_file="en",
-            vocab_file=self.vocab_path,
-            device="cpu"
+    def __init__(self):
+        # Get the package directory
+        package_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Set up paths relative to the package
+        self.weight_path = os.path.join(package_dir, "models", "hindi", "hi_111_model.pth")
+        self.tglyph_cfg_file = os.path.join(package_dir, "models", "hindi", "hi_scripts.json")
+        
+        # Initialize the model
+        self.model = XlitPiston(
+            weight_path=self.weight_path,
+            tglyph_cfg_file=self.tglyph_cfg_file
         )
-        # Expose model for testing
-        self.model = self.transliterator.model
 
-    def transliterate(self, word: str, topk: int = 1) -> Union[str, List[str]]:
+    def transliterate(self, word: str, topk: int = 5) -> Union[str, List[str]]:
         """
-        Transliterate a single Roman word to Devanagari (Hindi)
+        Transliterate a single word from Roman to Devanagari.
+        
         Args:
-            word: Input word (string)
-            topk: Number of top transliterations to return (default: 1)
+            word (str): The input word in Roman script
+            topk (int): Number of transliteration candidates to return (default: 5)
+            
         Returns:
-            If topk=1: Single transliterated word
-            If topk>1: List of top-k transliterated words
+            Union[str, List[str]]: If topk=1, returns a single string. Otherwise returns a list of strings.
+            
+        Raises:
+            ValueError: If word is None or not a string
         """
         if word is None:
-            raise ValueError("Input must not be None")
+            raise ValueError("Input word cannot be None")
         if not isinstance(word, str):
-            raise ValueError("Input must be a string")
-        if not word.strip():
-            return "" if topk == 1 else [""]
+            raise ValueError("Input word must be a string")
+        if not word:
+            return ""
             
-        # Handle special characters
-        special_chars = []
-        word_chars = []
-        for char in word:
-            if char.isalpha():
-                word_chars.append(char)
-            else:
-                special_chars.append(char)
+        # Pre-process the word
+        word = self._pre_process(word)
         
-        # Transliterate word
-        if word_chars:
-            transliterated = self.transliterator.inferencer(''.join(word_chars), beam_width=topk)
-            results = transliterated[:topk]
-        else:
-            results = ['']
+        # Get transliteration candidates
+        candidates = self.model.character_model(word, beam_width=topk)
         
-        # Add special characters
-        results = [r + ''.join(special_chars) for r in results]
+        # Post-process the candidates
+        candidates = self._post_process(candidates)
         
-        return results[0] if topk == 1 else results
+        # Return single string if topk=1, otherwise return list
+        return candidates[0] if topk == 1 else candidates
 
-    def transliterate_batch(self, words: List[str], topk: int = 1) -> List[Union[str, List[str]]]:
-        """Transliterate a batch of words"""
+    def transliterate_batch(self, words: List[str], topk: int = 5) -> List[Union[str, List[str]]]:
+        """
+        Transliterate a batch of words from Roman to Devanagari.
+        
+        Args:
+            words (List[str]): List of input words in Roman script
+            topk (int): Number of transliteration candidates to return per word (default: 5)
+            
+        Returns:
+            List[Union[str, List[str]]]: List of transliterated words. Each word is either a string (if topk=1)
+                                        or a list of strings (if topk>1)
+                                        
+        Raises:
+            ValueError: If words is None or not a list
+        """
         if words is None:
-            raise ValueError("Input must not be None")
+            raise ValueError("Input words cannot be None")
         if not isinstance(words, list):
-            raise ValueError("Input must be a list of strings")
-        return [self.transliterate(w, topk) for w in words] 
+            raise ValueError("Input words must be a list")
+            
+        return [self.transliterate(word, topk) for word in words]
+
+    def _pre_process(self, word: str) -> str:
+        """
+        Pre-process the input word for word-level transliteration (no language token prefix).
+        Args:
+            word: Input word to pre-process
+        Returns:
+            Pre-processed word ready for transliteration
+        """
+        # Convert to lowercase and strip whitespace
+        return word.lower().strip()
+
+    def _post_process(self, results: List[str]) -> List[str]:
+        """
+        Post-process the transliteration results following AI4Bharat's approach
+        Args:
+            results: List of transliterated words
+        Returns:
+            Post-processed list of transliterated words
+        """
+        processed_results = []
+        for result in results:
+            # Remove the language token prefix if it exists
+            if result.startswith('__hi__'):
+                result = result[6:]
+            
+            # Handle word-final virama (halant) using actual Unicode characters
+            result = re.sub(r'([क-हक़-य़])\u094d$', r'\1' + '\u094d\u200c', result)
+            
+            if result not in processed_results:
+                processed_results.append(result)
+        return processed_results 

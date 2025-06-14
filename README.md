@@ -1,14 +1,14 @@
-# Hindi Transliterator
+# Hindi Transliteration Library
 
-A Python package for Roman to Devanagari (Hindi) transliteration using AI4Bharat's model.
+A Python library for transliterating English text to Hindi using AI4Bharat's model. This library provides a simple interface for converting English words to their Hindi (Devanagari) equivalents.
 
 ## Features
 
-- Word-level transliteration from Roman to Devanagari
-- Support for multiple transliteration options (top-k)
+- Simple and intuitive API
+- Supports both single word and batch transliteration
+- Returns multiple transliteration candidates
+- CPU-only implementation (no GPU required)
 - Interactive command-line interface
-- Simple Python API
-- CPU-only (no GPU required)
 
 ## Installation
 
@@ -18,22 +18,7 @@ pip install hindi-xlit
 
 ## Usage
 
-### Command Line Interface
-
-```bash
-# Start interactive transliterator
-hindi-xlit
-
-# Set number of transliterations to show
-topk 5
-
-# Enter words to transliterate
-namaste
-bharat
-hindi
-```
-
-### Python API
+### Basic Usage
 
 ```python
 from hindi_xlit import HindiTransliterator
@@ -41,41 +26,52 @@ from hindi_xlit import HindiTransliterator
 # Initialize the transliterator
 transliterator = HindiTransliterator()
 
-# Single word transliteration
-hindi = transliterator.transliterate("namaste")
-print(hindi)  # नमस्ते
+# Transliterate a single word
+word = "namaste"
+candidates = transliterator.transliterate(word)
+print(f"Transliteration candidates for '{word}':")
+for i, candidate in enumerate(candidates, 1):
+    print(f"{i}. {candidate}")
 
-# Get multiple transliterations
-hindi_options = transliterator.transliterate("bharat", topk=3)
-print(hindi_options)  # ['भारत', 'भरत', 'भरट']
-
-# Batch transliteration
-words = ["namaste", "bharat", "hindi"]
+# Transliterate multiple words
+words = ["hello", "world"]
 results = transliterator.transliterate_batch(words)
-print(results)  # ['नमस्ते', 'भारत', 'हिंदी']
+for word, candidates in zip(words, results):
+    print(f"\nTransliteration candidates for '{word}':")
+    for i, candidate in enumerate(candidates, 1):
+        print(f"{i}. {candidate}")
 ```
 
-## Model
+### Command Line Interface
 
-This package uses AI4Bharat's Hindi transliteration model. The model files are automatically downloaded when the package is installed.
+The library provides an interactive command-line interface:
 
-## Development
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/hindi_xlit.git
-cd hindi_xlit
+hindi-xlit
 ```
 
-2. Install development dependencies:
-```bash
-pip install -e ".[dev]"
-```
+Available commands:
+- Type a word to transliterate
+- Type multiple words separated by spaces for batch transliteration
+- Type `topk N` to change the number of candidates (default: 5)
+- Type `help` to show help
+- Type `quit` or `exit` to exit
 
-3. Run tests:
-```bash
-python -m pytest
-```
+## API Reference
+
+### HindiTransliterator
+
+The main class for Hindi transliteration.
+
+#### Methods
+
+- `transliterate(word: str, topk: int = 5) -> List[str]`
+  - Transliterates a single word to Hindi
+  - Returns a list of top-k transliteration candidates
+
+- `transliterate_batch(words: List[str], topk: int = 5) -> List[List[str]]`
+  - Transliterates multiple words to Hindi
+  - Returns a list of lists, where each inner list contains top-k transliteration candidates for the corresponding word
 
 ## License
 
@@ -83,4 +79,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [AI4Bharat](https://ai4bharat.org/) for the original transliteration model
+This library uses the transliteration model from [AI4Bharat](https://github.com/AI4Bharat/IndicXlit).

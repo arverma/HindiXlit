@@ -3,6 +3,7 @@ import json
 import torch
 import torch.nn as nn
 import numpy as np
+from typing import List
 
 # --- GlyphStrawboss ---
 class GlyphStrawboss:
@@ -165,8 +166,8 @@ class Seq2Seq(nn.Module):
 
 # --- XlitPiston ---
 class XlitPiston:
-    def __init__(self, weight_path, tglyph_cfg_file, iglyph_cfg_file="en", vocab_file=None, device="cpu"):
-        self.device = device
+    def __init__(self, weight_path, tglyph_cfg_file, iglyph_cfg_file="en", vocab_file=None, device=None):
+        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.in_glyph_obj = GlyphStrawboss(iglyph_cfg_file)
         self.tgt_glyph_obj = GlyphStrawboss(glyphs=tglyph_cfg_file)
         if vocab_file:
@@ -193,6 +194,7 @@ class XlitPiston:
         weights = torch.load(weight_path, map_location=torch.device(self.device))
         self.model.load_state_dict(weights)
         self.model.eval()
+
     def character_model(self, word, beam_width=1):
         in_vec = torch.from_numpy(self.in_glyph_obj.word2xlitvec(word)).to(self.device)
         p_out_list = self.model.active_beam_inference(in_vec, beam_width=beam_width)
@@ -200,6 +202,7 @@ class XlitPiston:
         if self.voc_sanitizer:
             return self.voc_sanitizer.reposition(p_result)
         return p_result
+
     def inferencer(self, sequence, beam_width=10):
         seg = [sequence]
         lit_seg = []
