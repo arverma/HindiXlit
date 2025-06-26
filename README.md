@@ -44,34 +44,36 @@ for word, candidates in zip(words, results):
 
 ### Command Line Interface
 
-The library provides an interactive command-line interface:
+After installing the package (e.g., via pip from PyPI), you can use the command line interface:
 
 ```bash
-hindi-xlit
+hindi-xlit <word> [topk]
 ```
 
-Available commands:
-- Type a word to transliterate
-- Type multiple words separated by spaces for batch transliteration
-- Type `topk N` to change the number of candidates (default: 5)
-- Type `help` to show help
-- Type `quit` or `exit` to exit
+- `<word>`: The word in Roman script to transliterate (required)
+- `[topk]`: (Optional) Number of transliteration candidates to return (default: 3)
 
-## API Reference
+**Examples:**
 
-### HindiTransliterator
+```bash
+hindi-xlit namaste
+# Output:
+# Transliteration candidates for 'namaste':
+# 1. नमस्ते
+# 2. नमसते
+# 3. नामसते
 
-The main class for Hindi transliteration.
+hindi-xlit hello 5
+# Output:
+# Transliteration candidates for 'hello':
+# 1. हेलो
+# 2. हैलो
+# 3. हेलों
+# 4. हिलो
+# 5. हीलो
+```
 
-#### Methods
-
-- `transliterate(word: str, topk: int = 5) -> List[str]`
-  - Transliterates a single word to Hindi
-  - Returns a list of top-k transliteration candidates
-
-- `transliterate_batch(words: List[str], topk: int = 5) -> List[List[str]]`
-  - Transliterates multiple words to Hindi
-  - Returns a list of lists, where each inner list contains top-k transliteration candidates for the corresponding word
+If you run the command without arguments, it will show usage instructions.
 
 ## License
 
@@ -80,3 +82,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 This library uses the transliteration model from [AI4Bharat](https://github.com/AI4Bharat/IndicXlit).
+
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.

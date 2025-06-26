@@ -9,4 +9,4 @@ __version__ = "1.0.0"
 
 from .transliterator import HindiTransliterator
 
-__all__ = ["HindiTransliterator"] 
+__all__ = ["HindiTransliterator"]
