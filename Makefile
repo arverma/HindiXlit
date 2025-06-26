@@ -1,7 +1,7 @@
 # HindiXlit Makefile - pyproject.toml based build and deployment
 # Uses modern Python packaging standards with pyproject.toml
 
-.PHONY: help install-dev clean build publish clean-all setup-venv
+.PHONY: help install-dev clean build publish clean-all setup-venv lint check
 
 # Default target
 help:
@@ -17,6 +17,8 @@ help:
 	@echo ""
 	@echo "Development:"
 	@echo "  format         Format code"
+	@echo "  lint           Run linting checks"
+	@echo "  check          Run format and lint"
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean          Clean build artifacts"
@@ -33,7 +35,7 @@ setup-venv:
 # Installation development dependencies
 install-dev:
 	@echo "Installing development dependencies..."
-	pip install build twine black flake8 pytest pytest-cov
+	pip install build twine black flake8
 
 # Building using pyproject.toml
 build:
@@ -54,6 +56,18 @@ format:
 	else \
 		echo "black not found. Install with: make install-dev"; \
 	fi
+
+# Linting tasks
+lint:
+	@echo "Running linting checks..."
+	@if command -v flake8 >/dev/null 2>&1; then \
+		flake8 hindi_xlit/ playground.py --max-line-length=100 --ignore=E203,W503; \
+	else \
+		echo "flake8 not found. Install with: make install-dev"; \
+	fi
+
+# Check tasks
+check: format lint
 
 # Cleaning tasks
 clean:

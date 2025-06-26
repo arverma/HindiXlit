@@ -41,7 +41,8 @@ class HindiTransliterator:
             topk (int): Number of transliteration candidates to return (default: 3)
 
         Returns:
-            Union[str, List[str]]: If topk=1, returns a single string. Otherwise returns a list of strings.
+            Union[str, List[str]]: If topk=1, returns a single string.
+            Otherwise returns a list of strings.
 
         Raises:
             ValueError: If word is None or not a string
@@ -77,11 +78,11 @@ class HindiTransliterator:
 
         Args:
             words (List[str]): List of input words in Roman script
-            topk (int): Number of transliteration candidates to return per word (default: 3)
+            topk (int): Number of transliteration per word (default: 3)
 
         Returns:
-            List[Union[str, List[str]]]: List of transliterated words. Each word is either a string (if topk=1)
-                                        or a list of strings (if topk>1)
+            List[Union[str, List[str]]]: List of transliterated words.
+            Each word is either a string (if topk=1) or a list of strings (if topk>1)
 
         Raises:
             ValueError: If words is None or not a list
@@ -125,34 +126,36 @@ class HindiTransliterator:
                 processed_results.append(result)
         return processed_results
 
+
 def main():
     """
     Simple command line interface for Hindi transliteration.
     """
     import sys
-    
+
     if len(sys.argv) < 2:
         print("Usage: hindi-xlit <word> [topk]")
         print("Example: hindi-xlit namaste 5")
         sys.exit(1)
-    
+
     word = sys.argv[1]
     topk = int(sys.argv[2]) if len(sys.argv) > 2 else 3
-    
+
     try:
         transliterator = HindiTransliterator()
         results = transliterator.transliterate(word, topk)
-        
+
         print(f"Transliteration candidates for '{word}':")
         if isinstance(results, list):
             for i, result in enumerate(results, 1):
                 print(f"{i}. {result}")
         else:
             print(f"1. {results}")
-            
+
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

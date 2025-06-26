@@ -3,7 +3,6 @@ import json
 import torch
 import torch.nn as nn
 import numpy as np
-from typing import List
 
 
 # --- GlyphStrawboss ---
@@ -175,7 +174,6 @@ class Seq2Seq(nn.Module):
         self.pass_enc2dec_hid = pass_enc2dec_hid
 
     def active_beam_inference(self, src, beam_width=3, max_tgt_sz=50):
-        batch_size = 1
         start_tok = src[0]
         end_tok = src[-1]
         src_sz = torch.tensor([len(src)])
