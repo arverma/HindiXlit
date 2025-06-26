@@ -1,4 +1,2 @@
-from hindi_xlit.transliterator import HindiTransliterator
-
-transliterator = HindiTransliterator()
-print(transliterator.transliterate("namaste"))
+from hindi_xlit import HindiTransliterator
+print(HindiTransliterator().transliterate('aman', 5))

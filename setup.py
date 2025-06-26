@@ -4,6 +4,7 @@ Setup script for Hindi Transliteration Library
 
 from setuptools import setup, find_packages
 import os
+import re
 
 # Read the contents of README.md
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -11,16 +12,19 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 # Read the contents of requirements.txt
 with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = fh.read().splitlines()
+    requirements = [line.strip() for line in fh if line.strip() and not line.startswith('#')]
 
 # Get the version from the package
-version = {}
 with open(os.path.join("hindi_xlit", "__init__.py"), "r", encoding="utf-8") as fh:
-    exec(fh.read(), version)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", fh.read(), re.M)
+    if version_match:
+        version = version_match.group(1)
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 setup(
     name="hindi_xlit",
-    version=version["__version__"],
+    version=version,
     author="Aman Ranjan Verma",
     author_email="aman.ranjanverma@gmail.com",
     description="A Hindi transliteration package using AI4Bharat's model",
@@ -29,7 +33,7 @@ setup(
     url="https://github.com/arverma/HindiXlit",
     packages=find_packages(),
     classifiers=[
-        "Development Status :: Beta",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
@@ -58,5 +62,5 @@ setup(
             "models/hindi/*.json",
         ],
     },
-    zip_safe=False,
+    zip_safe=False,  # Required for package data
 ) 

@@ -28,13 +28,13 @@ class HindiTransliterator:
             tglyph_cfg_file=self.tglyph_cfg_file
         )
 
-    def transliterate(self, word: str, topk: int = 5) -> Union[str, List[str]]:
+    def transliterate(self, word: str, topk: int = 3) -> Union[str, List[str]]:
         """
         Transliterate a single word from Roman to Devanagari.
         
         Args:
             word (str): The input word in Roman script
-            topk (int): Number of transliteration candidates to return (default: 5)
+            topk (int): Number of transliteration candidates to return (default: 3)
             
         Returns:
             Union[str, List[str]]: If topk=1, returns a single string. Otherwise returns a list of strings.
@@ -49,6 +49,10 @@ class HindiTransliterator:
         if not word:
             return ""
             
+        # Check if word contains special characters, digits, or is an email
+        if re.search(r'[^a-zA-Z]', word):
+            return word
+            
         # Pre-process the word
         word = self._pre_process(word)
         
@@ -61,13 +65,13 @@ class HindiTransliterator:
         # Return single string if topk=1, otherwise return list
         return candidates[0] if topk == 1 else candidates
 
-    def transliterate_batch(self, words: List[str], topk: int = 5) -> List[Union[str, List[str]]]:
+    def transliterate_batch(self, words: List[str], topk: int = 3) -> List[Union[str, List[str]]]:
         """
         Transliterate a batch of words from Roman to Devanagari.
         
         Args:
             words (List[str]): List of input words in Roman script
-            topk (int): Number of transliteration candidates to return per word (default: 5)
+            topk (int): Number of transliteration candidates to return per word (default: 3)
             
         Returns:
             List[Union[str, List[str]]]: List of transliterated words. Each word is either a string (if topk=1)
