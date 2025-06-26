@@ -1,15 +1,15 @@
 # HindiXlit Makefile - pyproject.toml based build and deployment
 # Uses modern Python packaging standards with pyproject.toml
 
-.PHONY: help install-dev clean build publish clean-all setup-venv lint check
+.PHONY: help dev clean build publish clean-all venv lint check
 
 # Default target
 help:
 	@echo "HindiXlit - pyproject.toml based build system"
 	@echo ""
 	@echo "Setup & Installation:"
-	@echo "  setup-venv     Create virtual environment"
-	@echo "  install-dev    Install development dependencies"
+	@echo "  venv     Create virtual environment"
+	@echo "  dev    Install development dependencies"
 	@echo ""
 	@echo "Building & Distribution:"
 	@echo "  build          Build package using pyproject.toml"
@@ -25,7 +25,7 @@ help:
 	@echo "  clean-all      Clean everything including venv"
 
 # Virtual environment setup
-setup-venv:
+venv:
 	@echo "Creating virtual environment..."
 	python3 -m venv venv
 	@echo "Virtual environment created. Activate with:"
@@ -33,9 +33,9 @@ setup-venv:
 	@echo "venv\\Scripts\\activate     # Windows"
 
 # Installation development dependencies
-install-dev:
-	@echo "Installing development dependencies..."
-	pip install build twine black flake8
+dev:
+	@echo "Installing package with development dependencies..."
+	pip install -e ".[dev]"
 
 # Building using pyproject.toml
 build:
@@ -54,7 +54,7 @@ format:
 	@if command -v black >/dev/null 2>&1; then \
 		black hindi_xlit/ playground.py; \
 	else \
-		echo "black not found. Install with: make install-dev"; \
+		echo "black not found. Install with: make dev"; \
 	fi
 
 # Linting tasks
@@ -63,7 +63,7 @@ lint:
 	@if command -v flake8 >/dev/null 2>&1; then \
 		flake8 hindi_xlit/ playground.py --max-line-length=100 --ignore=E203,W503; \
 	else \
-		echo "flake8 not found. Install with: make install-dev"; \
+		echo "flake8 not found. Install with: make dev"; \
 	fi
 
 # Check tasks
