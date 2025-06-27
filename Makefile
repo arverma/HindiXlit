@@ -11,10 +11,6 @@ help:
 	@echo "  venv     Create virtual environment"
 	@echo "  dev    Install development dependencies"
 	@echo ""
-	@echo "Building & Distribution:"
-	@echo "  build          Build package using pyproject.toml"
-	@echo "  publish        Publish to PyPI"
-	@echo ""
 	@echo "Development:"
 	@echo "  format         Format code"
 	@echo "  lint           Run linting checks"
@@ -23,6 +19,10 @@ help:
 	@echo "Cleaning:"
 	@echo "  clean          Clean build artifacts"
 	@echo "  clean-all      Clean everything including venv"
+	@echo ""
+	@echo "Building & Distribution:"
+	@echo "  build          Build package using pyproject.toml"
+	@echo "  publish        Publish to PyPI"
 
 # Virtual environment setup
 venv:
@@ -42,11 +42,9 @@ build:
 	@echo "Building package using pyproject.toml and creating distribution files..."
 	python -m build --sdist --wheel
 
-publish: build
+publish:
 	@echo "Publishing to PyPI..."
-	@echo "Note: This requires PyPI credentials"
-	@echo "Run: twine upload dist/*"
-	@echo "Or for test PyPI: twine upload --repository testpypi dist/*"
+	twine upload dist/*
 
 # Development tasks
 format:
