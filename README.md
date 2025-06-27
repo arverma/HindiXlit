@@ -3,11 +3,7 @@
 A Python library for transliterating English text to Hindi using AI4Bharat's model. This library provides a simple interface for converting English words to their Hindi (Devanagari) equivalents.
 
 ## Features
-
-- Simple and intuitive API
-- Supports both single word and batch transliteration
-- Returns multiple transliteration candidates
-- CPU-only implementation (no GPU required)
+- Returns multiple transliteration candidates, default is 3
 - Interactive command-line interface
 
 ## Installation
